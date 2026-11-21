@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Build.app BETA | CZ/SK Minecraft Building Portal</title>
+  <style>
+    :root {
+      --bg-body: #050507;
+      --bg-header: #1e2028;
+      --header-text: #ffffff;
+      --bg-menu: #0c0e14;
+      --menu-text: #f1f5f9;
+      --bg-card: #0f1117;
+      --bg-card-hover: #161922;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --border-color: #262a36;
+      --turquoise: #00e5ff;
+      --turquoise-glow: rgba(0, 229, 255, 0.45);
+    }
+
+    body.light-theme {
+      --bg-body: #ffffff;
+      --bg-header: #00d2e6;
+      --header-text: #050507;
+      --bg-menu: #ffffff;
+      --menu-text: #0f172a;
+      --bg-card: #f8fafc;
+      --bg-card-hover: #f1f5f9;
+      --text-main: #0f172a;
+      --text-muted: #475569;
+      --border-color: #cbd5e1;
+      --turquoise: #00b8cc;
+      --turquoise-glow: rgba(0, 210, 230, 0.4);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-body);
+      color: var(--text-main);
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background-color 0.35s ease, color 0.35s ease;
+    }
+
+    header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 72px;
+      background-color: var(--bg-header);
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 25px;
+      z-index: 1000;
+      transition: background-color 0.35s ease;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-trigger {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      padding: 6px 12px;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      transition: all 0.25s ease;
+      user-select: none;
+    }
+
+    body.light-theme .logo-trigger {
+      background: rgba(255, 255, 255, 0.85);
+      border-color: rgba(0, 0, 0, 0.15);
+      color: #050507;
+    }
+
+    .logo-trigger:hover {
+      border-color: var(--turquoise);
+      box-shadow: 0 0 15px var(--turquoise-glow);
+    }
+
+    .menu-bars {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .menu-bars div {
+      width: 20px;
+      height: 2.5px;
+      background: var(--turquoise);
+      border-radius: 2px;
+    }
+
+    body.light-theme .menu-bars div {
+      background: #050507;
+    }
+
+    .logo-badge {
+      font-weight: 900;
+      font-size: 1.1rem;
+      letter-spacing: 1px;
+    }
+
+    .custom-logo-img {
+      height: 36px;
+      width: 36px;
+      object-fit: cover;
+      border-radius: 6px;
+      display: none;
+    }
+
+    .theme-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(0, 0, 0, 0.25);
+      color: var(--turquoise);
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.25s ease;
+    }
+
+    body.light-theme .theme-btn {
+      background: rgba(255, 255, 255, 0.85);
+      border-color: rgba(0, 0, 0, 0.15);
+      color: #050507;
+    }
+
+    .theme-btn:hover {
+      box-shadow: 0 0 15px var(--turquoise-glow);
+      transform: scale(1.05);
+    }
+
+    .brand-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-title {
+      font-size: 1.55rem;
+      font-weight: 900;
+      letter-spacing: 1.2px;
+      color: var(--header-text);
+    }
+
+    .brand-title span {
+      color: var(--turquoise);
+    }
+
+    body.light-theme .brand-title span {
+      color: #ffffff;
+    }
+
+    .beta-pill {
+      font-size: 0.72rem;
+      font-weight: 900;
+      letter-spacing: 1.2px;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(0, 229, 255, 0.18);
+      color: var(--turquoise);
+      border: 1px solid var(--turquoise);
+      box-shadow: 0 0 10px var(--turquoise-glow);
+    }
+
+    body.light-theme .beta-pill {
+      background: #050507;
+      color: #00e5ff;
+      border-color: #050507;
+    }
+
+    .header-right {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--header-text);
+      opacity: 0.85;
+    }
+
+    .side-menu {
+      position: fixed;
+      top: 72px;
+      left: -310px;
+      width: 290px;
+      height: calc(100vh - 72px);
+      background-color: var(--bg-menu);
+      border-right: 1px solid var(--border-color);
+      padding: 28px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+      transition: left 0.38s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.35s ease;
+      z-index: 999;
+    }
+
+    .side-menu.open {
+      left: 0;
+      box-shadow: 15px 0 35px rgba(0, 0, 0, 0.5);
+    }
+
+    .nav-item {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--menu-text);
+      font-size: 1.12rem;
+      font-weight: 600;
+      text-align: left;
+      padding: 13px 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-item:hover, .nav-item.active {
+      color: var(--turquoise);
+      background: rgba(0, 229, 255, 0.1);
+      border-color: var(--turquoise);
+      text-shadow: 0 0 10px var(--turquoise-glow);
+      box-shadow: 0 0 15px var(--turquoise-glow);
+      transform: translateX(5px);
+    }
+
+    .hero-banner {
+      margin-top: 72px;
+      width: 100%;
+      height: 280px;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 2px solid var(--turquoise);
+      background: linear-gradient(135deg, #0b131e 0%, #062830 50%, #050507 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hero-banner img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.65;
+    }
+
+    .banner-overlay {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 20px 28px;
+      background: rgba(5, 5, 7, 0.6);
+      backdrop-filter: blur(5px);
+      border-radius: 14px;
+      border: 1px solid rgba(0, 229, 255, 0.35);
+      margin: 0 15px;
+    }
+
+    .banner-overlay h2 {
+      color: #ffffff;
+      font-size: 1.85rem;
+      margin-bottom: 6px;
+    }
+
+    .banner-overlay p {
+      color: #cbd5e1;
+      font-size: 1rem;
+    }
+
+    .banner-dots {
+      position: absolute;
+      bottom: 14px;
+      z-index: 3;
+      display: flex;
+      gap: 8px;
+    }
+
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.4);
+      border: none;
+      cursor: pointer;
+      transition: 0.25s;
+    }
+
+    .dot.active {
+      background: var(--turquoise);
+      box-shadow: 0 0 10px var(--turquoise);
+      transform: scale(1.2);
+    }
+
+    main {
+      max-width: 1150px;
+      margin: 45px auto 70px;
+      padding: 0 20px;
+    }
+
+    .section {
+      display: none;
+      animation: fadeIn 0.35s ease forwards;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      font-size: 2.2rem;
+      margin-bottom: 8px;
+    }
+
+    h1 span {
+      color: var(--turquoise);
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      margin-bottom: 30px;
+      font-size: 1.02rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+      gap: 24px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 24px;
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--turquoise);
+      transform: translateY(-4px);
+      box-shadow: 0 8px 25px var(--turquoise-glow);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 10px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      border-radius: 6px;
+      background: rgba(0, 229, 255, 0.14);
+      color: var(--turquoise);
+      border: 1px solid rgba(0, 229, 255, 0.35);
+      margin-bottom: 5px;
+    }
+
+    .card-info {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+
+    .mod-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 14px 0 20px;
+    }
+
+    .mod-tag {
+      font-size: 0.8rem;
+      padding: 4px 10px;
+      border-radius: 6px;
+      background: rgba(0, 229, 255, 0.08);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+    }
+
+    .btn {
+      width: 100%;
+      padding: 12px 18px;
+      background: transparent;
+      color: var(--turquoise);
+      border: 1.5px solid var(--turquoise);
+      border-radius: 10px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      text-align: center;
+      display: inline-block;
+      text-decoration: none;
+    }
+
+    .btn:hover {
+      background: var(--turquoise);
+      color: #050507;
+      box-shadow: 0 0 20px var(--turquoise-glow);
+    }
+
+    .rules-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .rules-list li {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      padding: 18px 22px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .rule-num {
+Kód používajte opatrne.
+background: rgba(0, 229, 255, 0.15);
+color: var(--turquoise);
+font-weight: 800;
+width: 32px;
+height: 32px;
+display: flex;
+align-items: center;
+justify-content: center;
+border-radius: 8px;
+flex-shrink: 0;
+}
+.gallery-img {
+width: 100%;
+height: 180px;
+object-fit: cover;
+border-radius: 8px;
+margin-bottom: 14px;
+background: rgba(0, 229, 255, 0.06);
+display: flex;
+align-items: center;
+justify-content: center;
+color: var(--text-muted);
+font-size: 0.9rem;
+border: 1px solid var(--border-color);
+}
+@media (max-width: 600px) {
+.header-right { display: none; }
+.brand-title { font-size: 1.3rem; }
+}</style>
+</head>
+
+
+
+<body>
+
+  <header>
+    <div class="header-left">
+      <div class="logo-trigger" onclick="toggleMenu()" title="Otvoriť menu">
+        <div class="menu-bars">
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+        <img id="customLogoImg" class="custom-logo-img" src="" alt="Logo">
+        <span class="logo-badge" id="logoTextFallback">LOGO</span>
+      </div>
+
+      <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" title="Prepnúť svetlý / tmavý motív">
+        🌙
+      </button>
+    </div>
+
+    <div class="brand-wrapper" onclick="goHome()" style="cursor: pointer;" title="Domovská stránka">
+      <div class="brand-title">Build<span>.app</span></div>
+      <span class="beta-pill">BETA</span>
+    </div>
+
+    <div class="header-right" onclick="openAbout()" style="cursor: pointer; text-decoration: underline;" title="Informácie o autorovi">BY SLENDYSK15</div>
+
+  </header>
+
+  <nav class="side-menu" id="sideMenu">
+    <button class="nav-item active" id="navHome" onclick="switchTab('home', this)">Domov & News <span>🏠</span></button>
+    <button class="nav-item" onclick="switchTab('modpack', this)">Modpack <span>💠</span></button>
+    <button class="nav-item" onclick="switchTab('ideas', this)">Ideas <span>→</span></button>
+    <button class="nav-item" onclick="switchTab('litematica', this)">Litematica <span>→</span></button>
+    <button class="nav-item" onclick="switchTab('pravidla', this)">Pravidlá <span>→</span></button>
+  </nav>
+
+  <div class="hero-banner">
+    <img id="bannerImg" src="" alt="Banner stavby" style="display: none;">
+    <div class="banner-overlay">
+      <h2 id="bannerTitle">Build.app BETA — Staviteľský Portál</h2>
+      <p id="bannerSub">Custom Modpack, Build Ideas a Litematica schematiky od Slendysk15</p>
+    </div>
+    <div class="banner-dots" id="bannerDots"></div>
+  </div>
+
+  <main>
+    <section id="home" class="section active">
+      <h1>Novinky & <span>News</span></h1>
+      <p class="subtitle">Sleduj všetky aktualizácie portálu Build.app BETA, nové schematiky a plány od Slendysk15.</p>
+      <div class="grid" id="newsContainer"></div>
+    </section>
+
+    <section id="modpack" class="section">
+      <h1>Oficiálny <span>Modpack</span></h1>
+      <p class="subtitle">Stiahni si náš vlastný staviteľský modpack so všetkými nástrojmi na jeden klik.</p>
+      <div class="grid" id="modpackContainer"></div>
+    </section>
+
+    <section id="ideas" class="section">
+      <h1>Build <span>Ideas</span></h1>
+      <p class="subtitle">Inšpirácie a najlepšie stavby z komunity a kanála Slendysk15.</p>
+      <div class="grid" id="ideasContainer"></div>
+    </section>
+
+    <section id="litematica" class="section">
+      <h1>Litematica & <span>Schematiky</span></h1>
+      <p class="subtitle">Stiahni si hotové stavby a šablóny priamo do svojho sveta.</p>
+      <div class="grid" id="litematicaContainer"></div>
+    </section>
+
+    <section id="pravidla" class="section">
+      <h1>Pravidlá <span>Komunity</span></h1>
+      <p class="subtitle">Základné pravidlá pre používanie našej stránky, modpacku a schematík.</p>
+      <ul class="rules-list" id="pravidlaContainer"></ul>
+    </section>
+
+    <section id="about" class="section">
+      <h1>O autorovi: <span>Slendysk15</span></h1>
+      <p class="subtitle">Zakladateľ portálu Build.app BETA, YouTuber a Minecraft staviteľ.</p>
+      <div class="card" style="max-width: 720px;">
+        <span class="badge">CREATOR & BUILDER</span>
+        <h2 style="margin: 8px 0 14px;">Ahoj, som Slendysk15!</h2>
+        <p class="card-info">
+          Sem si neskôr napíšeš vlastný text o sebe – napríklad ako dlho hráš Minecraft, aký štýl stavania máš najradšej (stredovek, moderné domy, organiku), prečo si vytvoril Build.app a odkaz na svoj YouTube kanál alebo Instagram.
+        </p>
+        <a href="https://youtube.com" target="_blank" class="btn">Môj YouTube kanál</a>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    const LOGO_OBRAZOK = "";
+
+    const NEWS = [
+      {
+        datum: "16. 11. 2026",
+        stitok: "SPUSTENIE BETA VERZIE",
+        nadpis: "Vitajte na novom portáli Build.app BETA!",
+        text: "Spustili sme prvú testovaciu verziu nášho staviteľského portálu. Nájdete tu oficiálny Modpack, inšpirácie na stavby (Ideas) a Litematica schematiky na stiahnutie."
+      },
+      {
+        datum: "Pripravujeme",
+        stitok: "CUSTOM MODPACK",
+        nadpis: "Pripravujeme vlastný Builder Modpack",
+        text: "Už čoskoro si budete môcť v záložke Modpack stiahnuť náš vyladený balíček módov s Axiom, WorldEditom a Litematicou."
+      },
+      {
+        datum: "Plán do budúcna",
+        stitok: "OZNÁMENIE",
+        nadpis: "Veľké staviteľské súťaže",
+        text: "Zatiaľ spoločne budujeme komunitu, zdieľame stavby a schematiky. Veľké oficiálne súťaže odpálime v budúcnosti!"
+      }
+    ];
+
+    const BANNERS = [
+      {
+        obrazok: "",
+        nadpis: "Build.app BETA — Staviteľský Portál",
+        podnadpis: "Custom Modpack, Build Ideas a Litematica schematiky od Slendysk15"
+      },
+      {
+        obrazok: "",
+        nadpis: "Vlastný Custom Modpack pre Staviteľov",
+        podnadpis: "Axiom, WorldEdit a Litematica pripravené na 1 klik v záložke Modpack"
+      }
+    ];
+
+    const MODPACKS = [
+      {
+        nazov: "Build.app Official Builder Pack",
+        verzia: "Minecraft 1.21.4 (Fabric)",
+        popis: "Kompletný balíček módov pre staviteľov na Build.app. Obsahuje najlepšie staviteľské nástroje aj módy na zvýšenie FPS.",
+        mody: ["Axiom", "WorldEdit", "Litematica", "Sodium", "Iris Shaders", "Mod Menu"],
+        odkaz: "#"
+      }
+    ];
+
+    const PRAVIDLA = [
+      "Všetky schematiky a modpacky na Build.app sú zadarmo pre osobné stavanie aj natáčanie videí.",
+      "Ak použiješ našu stavbu alebo schematiku vo svojom videu, spomeň v popise kanál Slendysk15 alebo portál Build.app.",
+      "Nevydávaj cudzie stavby z galérie Ideas za svoje vlastné.",
+      "Sleduj novinky na Instagrame – chystáme ďalšie aktualizácie a v budúcnosti aj veľké staviteľské súťaže!"
+    ];
+
+    const IDEAS = [
+      {
+        nazov: "Fantasy Veža",
+        autor: "Slendysk15",
+        popis: "Inšpirácia pre strechy a prácu s gradientom kameňa.",
+        obrazok: ""
+      },
+      {
+        nazov: "Moderná Vila",
+        autor: "Build.app Komunita",
+        popis: "Kombinácia bieleho betónu, tmavého dubu a skla.",
+        obrazok: ""
+      }
+    ];
+
+    const LITEMATICA = [
+      {
+        nazov: "Stredoveký Mlyn",
+        verzia: "1.21+",
+        subor: "#"
+      },
+      {
+        nazov: "Organický Strom Pack",
+        verzia: "1.20 - 1.21",
+        subor: "#"
+      }
+    ];
+
+    let currentBanner = 0;
+
+    function initLogo() {
+      if (LOGO_OBRAZOK) {
+        const img = document.getElementById('customLogoImg');
+        img.src = LOGO_OBRAZOK;
+        img.style.display = 'block';
+        document.getElementById('logoTextFallback').style.display = 'none';
+      }
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle('light-theme');
+      const isLight = document.body.classList.contains('light-theme');
+      document.getElementById('themeBtn').innerText = isLight ? '☀️' : '🌙';
+    }
+
+    function toggleMenu() {
+      document.getElementById('sideMenu').classList.toggle('open');
+    }
+
+    function goHome() {
+      const homeBtn = document.getElementById('navHome');
+      switchTab('home', homeBtn);
+    }
+    function openAbout() {
+      switchTab('about', null);
+    }
+
+
+    function switchTab(tabId, btnElement) {
+      document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
+
+      document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active'));
+      if (btnElement) btnElement.classList.add('active');
+
+      document.getElementById('sideMenu').classList.remove('open');
+    }
+
+    function setBanner(index) {
+      currentBanner = index;
+      const b = BANNERS[index];
+      const imgEl = document.getElementById('bannerImg');
+      if (b.obrazok) {
+        imgEl.src = b.obrazok;
+        imgEl.style.display = 'block';
+      } else {
+        imgEl.style.display = 'none';
+      }
+      document.getElementById('bannerTitle').innerText = b.nadpis;
+      document.getElementById('bannerSub').innerText = b.podnadpis;
+
+      document.querySelectorAll('.dot').forEach((d, idx) => {
+        d.classList.toggle('active', idx === index);
+      });
+    }
+
+    function initBanners() {
+      const dotsEl = document.getElementById('bannerDots');
+      dotsEl.innerHTML = BANNERS.map((_, i) => `<button class="dot ${i === 0 ? 'active' : ''}" onclick="setBanner(${i})"></button>`).join('');
+      setBanner(0);
+      setInterval(() => {
+        setBanner((currentBanner + 1) % BANNERS.length);
+      }, 6000);
+    }
+
+    function renderAll() {
+      document.getElementById('newsContainer').innerHTML = NEWS.map(n => `
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <span class="badge">${n.stitok}</span>
+            <span style="font-size: 0.82rem; color: var(--text-muted);">${n.datum}</span>
+          </div>
+          <h3 style="margin-bottom: 10px;">${n.nadpis}</h3>
+          <p class="card-info" style="margin-bottom: 0;">${n.text}</p>
+        </div>
+      `).join('');
+
+      document.getElementById('modpackContainer').innerHTML = MODPACKS.map(mp => `
+        <div class="card" style="grid-column: 1 / -1; max-width: 680px;">
+          <span class="badge">${mp.verzia}</span>
+          <h2 style="margin: 6px 0 12px;">${mp.nazov}</h2>
+          <p class="card-info" style="margin-bottom: 12px;">${mp.popis}</p>
+          <div class="mod-tags">
+            ${mp.mody.map(m => `<span class="mod-tag">✦ ${m}</span>`).join('')}
+          </div>
+          <a href="${mp.odkaz}" target="_blank" class="btn">Stiahnuť Modpack (.mrpack)</a>
+        </div>
+      `).join('');
+
+      document.getElementById('pravidlaContainer').innerHTML = PRAVIDLA.map((p, i) => `
+        <li>
+          <span class="rule-num">${i + 1}</span>
+          <span>${p}</span>
+        </li>
+      `).join('');
+
+      document.getElementById('ideasContainer').innerHTML = IDEAS.map(item => `
+        <div class="card">
+          ${item.obrazok 
+            ? `<img src="${item.obrazok}" class="gallery-img" alt="${item.nazov}">` 
+            : `<div class="gallery-img">Obrázok stavby (${item.nazov})</div>`}
+          <span class="badge">Autor: ${item.autor}</span>
+          <h3 style="margin: 6px 0;">${item.nazov}</h3>
+          <p class="card-info" style="margin-bottom: 0;">${item.popis}</p>
+        </div>
+      `).join('');
+      document.getElementById('litematicaContainer').innerHTML = LITEMATICA.map(lit => '<div class="card"><span class="badge">Verzia ' + lit.verzia + '</span><h3 style="margin: 8px 0 16px;">' + lit.nazov + '</h3><a href="' + lit.subor + '" download class="btn">Stiahnuť .litematic</a></div>').join('');
+
+}
+initLogo();
+initBanners();
+renderAll();
+  </script>
+</body>
+</html>
